@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ytdl from '@distube/ytdl-core';
 
+// Constants
+const REQUEST_TIMEOUT_MS = 30000;
+
 export async function POST(request: NextRequest) {
   try {
     const { url, quality, format } = await request.json();
@@ -30,14 +33,12 @@ export async function POST(request: NextRequest) {
     };
 
     // Get video info to extract title for filename with timeout
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Request timeout')), 30000)
-    );
-    
     const info = await Promise.race([
       ytdl.getInfo(url, options),
-      timeoutPromise
-    ]) as ytdl.videoInfo;
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), REQUEST_TIMEOUT_MS)
+      )
+    ]);
     
     const title = info.videoDetails.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
