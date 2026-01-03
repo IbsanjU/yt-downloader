@@ -1,20 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ytdl from '@distube/ytdl-core';
-
-// Constants
-const REQUEST_TIMEOUT_MS = 30000;
-
-// Helper function to create a timeout promise that can be cleared
-function createTimeoutPromise(ms: number): { promise: Promise<never>; clear: () => void } {
-  let timeoutId: NodeJS.Timeout;
-  const promise = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error('Request timeout')), ms);
-  });
-  return {
-    promise,
-    clear: () => clearTimeout(timeoutId)
-  };
-}
+import { createTimeoutPromise, REQUEST_TIMEOUT_MS } from '../utils/timeout';
 
 // Validate YouTube URL
 function isValidYouTubeUrl(url: string): boolean {
