@@ -54,15 +54,16 @@ YouTube may block automated requests with "Sign in to confirm you're not a bot" 
 
 **Step 5:** Create a `.env.local` file in the project root and add:
 ```bash
-YOUTUBE_COOKIES='[{"domain":".youtube.com",...}]'
+YOUTUBE_COOKIES='[{"domain":".youtube.com","expirationDate":1234567890,"hostOnly":false,"httpOnly":true,"name":"CONSENT","path":"/","sameSite":"no_restriction","secure":true,"session":false,"value":"YES+..."},{"domain":".youtube.com","name":"VISITOR_INFO1_LIVE","value":"..."}]'
 ```
 
-Paste the entire JSON array from your clipboard as the value (wrapped in single quotes).
+Paste the entire JSON array from your clipboard as the value (wrapped in single quotes). The actual array will be much longer with many cookie entries - paste all of them.
 
 **Important Notes:**
+- Paste ALL cookies from the clipboard - don't remove or edit any entries
 - Don't log out by clicking the logout button on YouTube, as it will expire your cookies
 - Use the same IP address consistently to keep cookies alive longer
-- Keep your cookies private and never commit them to version control
+- Keep your cookies private and never commit them to version control (`.env.local` is in `.gitignore` by default)
 
 4. Run the development server:
 ```bash

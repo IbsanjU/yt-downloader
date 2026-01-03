@@ -39,12 +39,27 @@ export function createYtdlAgent(): ytdl.Agent | undefined {
 }
 
 /**
+ * Error message for bot detection
+ */
+export const BOT_DETECTION_ERROR_MESSAGE = 'YouTube detected automated access. Configure YOUTUBE_COOKIES environment variable to fix this. See README for setup instructions.';
+
+/**
+ * Options type for ytdl that supports both getInfo and download
+ */
+interface YtdlOptions {
+  requestOptions?: {
+    headers?: Record<string, string>;
+  };
+  agent?: ytdl.Agent;
+}
+
+/**
  * Gets the options for ytdl with agent and headers
  */
-export function getYtdlOptions() {
+export function getYtdlOptions(): YtdlOptions {
   const agent = createYtdlAgent();
   
-  const options: ytdl.getInfoOptions = {
+  const options: YtdlOptions = {
     requestOptions: {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',

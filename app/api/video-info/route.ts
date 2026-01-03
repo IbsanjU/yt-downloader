@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ytdl from '@distube/ytdl-core';
 import { createTimeoutPromise, REQUEST_TIMEOUT_MS } from '../utils/timeout';
-import { getYtdlOptions } from '../utils/agent';
+import { getYtdlOptions, BOT_DETECTION_ERROR_MESSAGE } from '../utils/agent';
 
 // Validate YouTube URL
 function isValidYouTubeUrl(url: string): boolean {
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     
     if (errorMessage.includes('bot') || errorMessage.includes('Sign in to confirm')) {
       return NextResponse.json(
-        { error: 'YouTube is blocking automated requests. Please configure YouTube cookies in YOUTUBE_COOKIES environment variable to bypass bot detection. See documentation for setup instructions.' },
+        { error: BOT_DETECTION_ERROR_MESSAGE },
         { status: 403 }
       );
     }
