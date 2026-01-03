@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ytdl from '@distube/ytdl-core';
 import { createTimeoutPromise, REQUEST_TIMEOUT_MS } from '../utils/timeout';
+import { getYtdlOptions } from '../utils/agent';
 
 // Validate YouTube URL
 function isValidYouTubeUrl(url: string): boolean {
@@ -30,15 +31,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Configure request options with User-Agent headers
-    const options = {
-      requestOptions: {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-        }
-      }
-    };
+    // Get ytdl options with agent and headers
+    const options = getYtdlOptions();
 
     // Get video info with timeout
     const timeout = createTimeoutPromise(REQUEST_TIMEOUT_MS);
@@ -94,6 +88,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Request timed out. Please try again later.' },
         { status: 504 }
+      );
+    }
+    
+    if (errorMessage.includes('bot') || errorMessage.includes('Sign in to confirm')) {
+      return NextResponse.json(
+        { error: 'YouTube is blocking automated requests. Please configure YouTube cookies in YOUTUBE_COOKIES environment variable to bypass bot detection. See documentation for setup instructions.' },
+        { status: 403 }
       );
     }
     

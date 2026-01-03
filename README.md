@@ -40,12 +40,36 @@ cd yt-downloader
 npm install
 ```
 
-3. Run the development server:
+3. (Optional) Configure YouTube cookies to bypass bot detection:
+
+YouTube may block automated requests with "Sign in to confirm you're not a bot" error. To fix this, you need to configure YouTube cookies:
+
+**Step 1:** Install [EditThisCookie](http://www.editthiscookie.com/) extension in your browser (Chrome/Edge).
+
+**Step 2:** Go to [YouTube](https://www.youtube.com/) and log in with your account (use a dedicated account for this purpose).
+
+**Step 3:** Click on the EditThisCookie extension icon and click the "Export" button (looks like a clipboard icon).
+
+**Step 4:** Your cookies will be copied to your clipboard as a JSON array.
+
+**Step 5:** Create a `.env.local` file in the project root and add:
+```bash
+YOUTUBE_COOKIES='[{"domain":".youtube.com",...}]'
+```
+
+Paste the entire JSON array from your clipboard as the value (wrapped in single quotes).
+
+**Important Notes:**
+- Don't log out by clicking the logout button on YouTube, as it will expire your cookies
+- Use the same IP address consistently to keep cookies alive longer
+- Keep your cookies private and never commit them to version control
+
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Usage
 
@@ -115,6 +139,35 @@ The application handles various error scenarios:
 - Unavailable or private videos
 - Network errors
 - Download failures
+- Bot detection by YouTube
+
+## Troubleshooting
+
+### "Sign in to confirm you're not a bot" Error
+
+This error occurs when YouTube detects automated requests. To fix it:
+
+1. **Configure YouTube cookies** (Recommended): Follow the cookie setup instructions in the Installation section above.
+
+2. **Wait it out**: YouTube's rate limiting usually expires within a few hours or days.
+
+3. **Use a VPN or proxy**: Sometimes changing your IP address can help.
+
+### Cookies Not Working
+
+If you've configured cookies but still getting errors:
+
+- Make sure the cookies JSON is valid (check for syntax errors)
+- Ensure you're using the same IP address as when you exported the cookies
+- Don't log out from the YouTube account on your browser
+- Try exporting fresh cookies from YouTube
+- Verify the `.env.local` file is in the project root directory
+
+### Other Common Issues
+
+- **Video unavailable**: The video may be private, deleted, or region-restricted
+- **Age-restricted videos**: These require cookie authentication
+- **Timeout errors**: The video server may be slow or overloaded; try again later
 
 ## Deploy on Vercel
 
