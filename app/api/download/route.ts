@@ -32,11 +32,15 @@ export async function POST(request: NextRequest) {
 
     // Get video info to extract title for filename with timeout
     const timeout = createTimeoutPromise(REQUEST_TIMEOUT_MS);
-    const info = await Promise.race([
-      ytdl.getInfo(url, options),
-      timeout.promise
-    ]);
-    timeout.clear();
+    let info;
+    try {
+      info = await Promise.race([
+        ytdl.getInfo(url, options),
+        timeout.promise
+      ]);
+    } finally {
+      timeout.clear();
+    }
     
     const title = info.videoDetails.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 

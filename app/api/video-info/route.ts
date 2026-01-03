@@ -42,14 +42,17 @@ export async function POST(request: NextRequest) {
 
     // Get video info with timeout
     const timeout = createTimeoutPromise(REQUEST_TIMEOUT_MS);
+    let info;
     try {
-      const info = await Promise.race([
+      info = await Promise.race([
         ytdl.getInfo(url, options),
         timeout.promise
       ]);
+    } finally {
       timeout.clear();
+    }
     
-      // Extract available formats
+    // Extract available formats
     const formats = info.formats
       .filter(format => format.hasVideo && format.hasAudio)
       .map(format => ({
@@ -80,11 +83,7 @@ export async function POST(request: NextRequest) {
       formats: formats,
     };
 
-      return NextResponse.json(videoInfo);
-    } catch (error) {
-      timeout.clear();
-      throw error;
-    }
+    return NextResponse.json(videoInfo);
   } catch (error) {
     console.error('Error fetching video info:', error);
     
