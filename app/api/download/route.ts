@@ -4,6 +4,18 @@ import ytdl from '@distube/ytdl-core';
 // Constants
 const REQUEST_TIMEOUT_MS = 30000;
 
+// Helper function to create a timeout promise that can be cleared
+function createTimeoutPromise(ms: number): { promise: Promise<never>; clear: () => void } {
+  let timeoutId: NodeJS.Timeout;
+  const promise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('Request timeout')), ms);
+  });
+  return {
+    promise,
+    clear: () => clearTimeout(timeoutId)
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { url, quality, format } = await request.json();
@@ -33,12 +45,12 @@ export async function POST(request: NextRequest) {
     };
 
     // Get video info to extract title for filename with timeout
+    const timeout = createTimeoutPromise(REQUEST_TIMEOUT_MS);
     const info = await Promise.race([
       ytdl.getInfo(url, options),
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), REQUEST_TIMEOUT_MS)
-      )
+      timeout.promise
     ]);
+    timeout.clear();
     
     const title = info.videoDetails.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 

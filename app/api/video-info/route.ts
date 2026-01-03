@@ -4,6 +4,18 @@ import ytdl from '@distube/ytdl-core';
 // Constants
 const REQUEST_TIMEOUT_MS = 30000;
 
+// Helper function to create a timeout promise that can be cleared
+function createTimeoutPromise(ms: number): { promise: Promise<never>; clear: () => void } {
+  let timeoutId: NodeJS.Timeout;
+  const promise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('Request timeout')), ms);
+  });
+  return {
+    promise,
+    clear: () => clearTimeout(timeoutId)
+  };
+}
+
 // Validate YouTube URL
 function isValidYouTubeUrl(url: string): boolean {
   try {
@@ -43,14 +55,15 @@ export async function POST(request: NextRequest) {
     };
 
     // Get video info with timeout
-    const info = await Promise.race([
-      ytdl.getInfo(url, options),
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), REQUEST_TIMEOUT_MS)
-      )
-    ]);
+    const timeout = createTimeoutPromise(REQUEST_TIMEOUT_MS);
+    try {
+      const info = await Promise.race([
+        ytdl.getInfo(url, options),
+        timeout.promise
+      ]);
+      timeout.clear();
     
-    // Extract available formats
+      // Extract available formats
     const formats = info.formats
       .filter(format => format.hasVideo && format.hasAudio)
       .map(format => ({
@@ -81,7 +94,11 @@ export async function POST(request: NextRequest) {
       formats: formats,
     };
 
-    return NextResponse.json(videoInfo);
+      return NextResponse.json(videoInfo);
+    } catch (error) {
+      timeout.clear();
+      throw error;
+    }
   } catch (error) {
     console.error('Error fetching video info:', error);
     
