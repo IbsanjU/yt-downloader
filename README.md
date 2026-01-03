@@ -52,7 +52,12 @@ YouTube may block automated requests with "Sign in to confirm you're not a bot" 
 
 **Step 4:** Your cookies will be copied to your clipboard as a JSON array.
 
-**Step 5:** Create a `.env.local` file in the project root and add:
+**Step 5:** Create a `.env.local` file in the project root (you can copy `.env.local.example` as a starting point):
+```bash
+cp .env.local.example .env.local
+```
+
+Then edit `.env.local` and set the `YOUTUBE_COOKIES` variable:
 ```bash
 YOUTUBE_COOKIES='[{"domain":".youtube.com","expirationDate":1234567890,"hostOnly":false,"httpOnly":true,"name":"CONSENT","path":"/","sameSite":"no_restriction","secure":true,"session":false,"value":"YES+..."},{"domain":".youtube.com","name":"VISITOR_INFO1_LIVE","value":"..."}]'
 ```
