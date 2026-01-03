@@ -18,7 +18,7 @@ A Next.js application that allows users to download YouTube videos in different 
 - **Next.js 14+** with App Router
 - **TypeScript** for type safety
 - **Tailwind CSS** for styling
-- **ytdl-core** for YouTube video extraction
+- **@distube/ytdl-core** for YouTube video extraction
 
 ## Getting Started
 
